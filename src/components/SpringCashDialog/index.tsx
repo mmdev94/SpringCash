@@ -3,8 +3,7 @@ import {
   Dialog,
   DialogContent,
   DialogTrigger,
-  DialogTitle,
-  DialogClose
+  DialogTitle
 } from '../ui/dialog';
 import { Button } from '../ui/button';
 import { X } from 'lucide-react';
@@ -14,7 +13,6 @@ import {
   InputOTPSeparator,
   InputOTPSlot
 } from '@/components/ui/input-otp';
-import { Card, CardContent } from '../ui/card';
 import { FlowerPattern, FlowerPattern1, VisaBrand } from '@/lib/icons';
 
 interface SpringCashCardProps {
@@ -29,7 +27,7 @@ interface SpringCashDialogProps {
   cvc: string;
 }
 
-const SpringCashDialog = ({ number, exp, cvc }: SpringCashCardProps) => {
+const SpringCashDialog = ({ number, exp, cvc }: SpringCashDialogProps) => {
   const [open, setOpen] = useState(false);
 
   return (
@@ -72,7 +70,7 @@ const SpringCashDialog = ({ number, exp, cvc }: SpringCashCardProps) => {
                   <div className="text-[32px] p-1.5 px-2.5 text-white bg-[#65BD82] rounded-md">
                     free <strong className="font-bold">$25</strong>
                   </div>
-                  <VisaBrand className="h-[28px] w-auto" />
+                  <VisaBrand />
                 </span>
                 card.
               </div>
