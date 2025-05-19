@@ -8,6 +8,10 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    "strict": false,
+    "noEmitOnError": false,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": false
   }
 }
