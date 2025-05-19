@@ -3,15 +3,7 @@ import { useEffect } from 'react';
 import { useWatch } from 'react-hook-form';
 import { X } from 'lucide-react';
 
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage
-} from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem } from '@/components/ui/form';
 import {
   InputOTP,
   InputOTPGroup,
@@ -20,12 +12,34 @@ import {
 } from '@/components/ui/input-otp';
 import { FlowerPattern, VisaBrand } from '@/lib/icons';
 
-const StepPhone = ({ form, onNext, number, exp, cvc, setOpen }) => {
+interface SpringCashCardProps {
+  number: string;
+  exp: string;
+  cvc: string;
+}
+
+interface StepPhoneProps {
+  form: any;
+  onNext: any;
+  number: string;
+  exp: string;
+  cvc: string;
+  setOpen: any;
+}
+
+const StepPhone = ({
+  form,
+  onNext,
+  number,
+  exp,
+  cvc,
+  setOpen
+}: StepPhoneProps) => {
   const phone = useWatch({ control: form.control, name: 'phone' });
 
   useEffect(() => {
     if (phone.length === 10) {
-      form.trigger('phone').then((valid) => valid && onNext());
+      form.trigger('phone').then((valid: any) => valid && onNext());
     }
   }, [phone]);
 
@@ -44,7 +58,7 @@ const StepPhone = ({ form, onNext, number, exp, cvc, setOpen }) => {
         <div className="absolute bottom-0 -right-7 opacity-20 flex lg:hidden">
           <FlowerPattern rotate={180} />
         </div>
-        <SpringCashCard number={number} exp={exp} cvc={cvc} image="card" />
+        <SpringCashCard number={number} exp={exp} cvc={cvc} />
       </div>
       <div className="bg-white order-1 lg:order-2 rounded-2xl shadow-xl p-8 relative z-20 w-full lg:w-1/2 h-full flex flex-col justify-center gap-6 font-mackinac min-h-[638px]">
         <div

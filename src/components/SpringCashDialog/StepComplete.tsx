@@ -3,16 +3,7 @@ import { FlowersPattern } from '@/lib/icons';
 import { X, CopyIcon } from 'lucide-react';
 import { SuccessIcon } from '@/lib/icons';
 import { Button } from '../ui/button';
-
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage
-} from '@/components/ui/form';
+import { toast } from 'sonner';
 
 interface TotalCardProps {
   number: string;
@@ -23,9 +14,18 @@ interface TotalCardProps {
   city: string;
 }
 
+interface StepCompleteProps {
+  number: string;
+  exp: string;
+  cvc: string;
+  name: string;
+  address1: string;
+  address2: string;
+  city: string;
+  setOpen: any;
+}
+
 const StepComplete = ({
-  cardInfo,
-  address,
   number,
   exp,
   cvc,
@@ -34,7 +34,7 @@ const StepComplete = ({
   address2,
   city,
   setOpen
-}) => {
+}: StepCompleteProps) => {
   return (
     <>
       <div className="absolute w-full h-full hidden lg:flex top-0 left-0">

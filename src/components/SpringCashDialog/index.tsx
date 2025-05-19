@@ -9,24 +9,10 @@ import { Button } from '../ui/button';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
-import { twMerge } from 'tailwind-merge';
-import { motion, AnimatePresence } from 'framer-motion';
-import { FloatingLabelInput } from '@/molecules/FloatingInput';
+import { motion } from 'framer-motion';
 import StepPhone from './StepPhone';
 import StepAddress from './StepAddress';
 import StepComplete from './StepComplete';
-
-interface SpringCashCardProps {
-  number: string;
-  exp: string;
-  cvc: string;
-}
-
-interface AddressCardProps {
-  name: string;
-  address1: string;
-  city: string;
-}
 
 interface SpringCashDialogProps {
   number: string;
@@ -108,10 +94,6 @@ const SpringCashDialog = ({ number, exp, cvc }: SpringCashDialogProps) => {
     }
   }, [phone]);
 
-  const onSubmit = (data: any) => {
-    setStep(2);
-  };
-
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -144,7 +126,6 @@ const SpringCashDialog = ({ number, exp, cvc }: SpringCashDialogProps) => {
             {step === 1 && (
               <StepAddress
                 form={second_form}
-                onBack={() => setStep(0)}
                 onNext={() => setStep(2)}
                 name={name}
                 address1={address1}
@@ -154,12 +135,10 @@ const SpringCashDialog = ({ number, exp, cvc }: SpringCashDialogProps) => {
             )}
             {step === 2 && (
               <StepComplete
-                cardInfo={{ number, exp, cvc }}
-                address={second_form.getValues()}
                 name={name}
                 city={city}
-                address1={address1}
-                address2={address2}
+                address1={address1 || ''}
+                address2={address2 || ''}
                 number={number}
                 exp={exp}
                 cvc={cvc}

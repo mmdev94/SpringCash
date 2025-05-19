@@ -2,18 +2,32 @@ import { FlowerPattern } from '@/lib/icons';
 import { Button } from '../ui/button';
 import { X } from 'lucide-react';
 
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage
-} from '@/components/ui/form';
+import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { FloatingLabelInput } from '@/molecules/FloatingInput';
 
-const StepAddress = ({ form, onNext, name, address1, city, setOpen }) => {
+interface AddressCardProps {
+  name: string;
+  address1: string;
+  city: string;
+}
+
+interface StepAddressProps {
+  form: any;
+  onNext: any;
+  name: string;
+  address1: string;
+  city: string;
+  setOpen: any;
+}
+
+const StepAddress = ({
+  form,
+  onNext,
+  name,
+  address1,
+  city,
+  setOpen
+}: StepAddressProps) => {
   const handleSubmit = form.handleSubmit(() => onNext());
 
   return (

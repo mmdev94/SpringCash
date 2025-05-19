@@ -24,7 +24,11 @@ export const FlowerPattern = ({
   );
 };
 
-export const FlowersPattern = ({ isMobile = false }: { isMobile: boolean }) => {
+export const FlowersPattern = ({
+  isMobile = false
+}: {
+  isMobile?: boolean;
+}) => {
   return (
     <>
       {!isMobile ? (
