@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -6,19 +6,26 @@ import {
   DialogTitle
 } from '../ui/dialog';
 import { Button } from '../ui/button';
-import { X } from 'lucide-react';
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSeparator,
-  InputOTPSlot
-} from '@/components/ui/input-otp';
-import { FlowerPattern, FlowerPattern1, VisaBrand } from '@/lib/icons';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm, useWatch } from 'react-hook-form';
+import { z } from 'zod';
+import { twMerge } from 'tailwind-merge';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FloatingLabelInput } from '@/molecules/FloatingInput';
+import StepPhone from './StepPhone';
+import StepAddress from './StepAddress';
+import StepComplete from './StepComplete';
 
 interface SpringCashCardProps {
   number: string;
   exp: string;
   cvc: string;
+}
+
+interface AddressCardProps {
+  name: string;
+  address1: string;
+  city: string;
 }
 
 interface SpringCashDialogProps {
@@ -27,8 +34,83 @@ interface SpringCashDialogProps {
   cvc: string;
 }
 
+const PhoneSchema = z.object({
+  phone: z
+    .string()
+    .transform((val) => val.replace(/\D/g, ''))
+    .refine((val) => /^\d{10}$/.test(val), {
+      message: 'Please enter a valid 10-digit U.S. phone number.'
+    })
+});
+
+const AddressSchema = z.object({
+  name: z.string().min(2, 'Name is required'),
+  address1: z.string().min(5, 'Address Line 1 is required'),
+  address2: z.string().optional(),
+  city: z.string().min(2, 'City is required'),
+  zip: z.string().regex(/^\d{5}$/, 'Zip Code must be a 5-digit number')
+});
+
 const SpringCashDialog = ({ number, exp, cvc }: SpringCashDialogProps) => {
   const [open, setOpen] = useState(false);
+  const [step, setStep] = useState(0);
+
+  const form = useForm<z.infer<typeof PhoneSchema>>({
+    resolver: zodResolver(PhoneSchema),
+    defaultValues: {
+      phone: ''
+    }
+  });
+
+  const second_form = useForm<z.infer<typeof AddressSchema>>({
+    resolver: zodResolver(AddressSchema),
+    defaultValues: {
+      name: '',
+      address1: '',
+      address2: '',
+      city: '',
+      zip: ''
+    }
+  });
+
+  const phone = useWatch({
+    control: form.control,
+    name: 'phone'
+  });
+
+  const name = useWatch({
+    control: second_form.control,
+    name: 'name'
+  });
+
+  const address1 = useWatch({
+    control: second_form.control,
+    name: 'address1'
+  });
+
+  const address2 = useWatch({
+    control: second_form.control,
+    name: 'address2'
+  });
+
+  const city = useWatch({
+    control: second_form.control,
+    name: 'city'
+  });
+
+  useEffect(() => {
+    if (phone && phone.length >= 10) {
+      form.trigger('phone').then((isValid) => {
+        if (isValid) {
+          setStep(1);
+        }
+      });
+    }
+  }, [phone]);
+
+  const onSubmit = (data: any) => {
+    setStep(2);
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -36,92 +118,58 @@ const SpringCashDialog = ({ number, exp, cvc }: SpringCashDialogProps) => {
         <Button>Get Your Free $25 VISA Card</Button>
       </DialogTrigger>
       <DialogContent
-        className="p-0 border-none lg:min-w-[1000px] min-h-[638px] bg-transparent shadow-none min-w-[500px] w-full lg:max-w-[1000px]"
+        className="p-0 border-none lg:min-w-[1000px] min-h-[638px] bg-transparent shadow-none min-w-[500px] w-full lg:max-w-[1000px] focus:outline-none"
         aria-describedby={undefined}
       >
         <DialogTitle className="sr-only">Spring Cash</DialogTitle>
         <div className="relative bg-[#65BD82] rounded-2xl overflow-auto flex flex-col max-h-[100vh]">
-          <div className="absolute top-0 left-0 opacity-20 hidden lg:flex">
-            <FlowerPattern />
-          </div>
-          <div className="absolute bottom-0 right-1/2 opacity-20 hidden lg:flex">
-            <FlowerPattern1 />
-          </div>
-          <div className="z-10 flex flex-col lg:flex-row lg:gap-0 gap-4 items-center px-7 py-8 h-full">
-            <div className="w-full order-2 lg:order-1 lg:w-1/2 min-h-[638px] flex justify-center bg-transparent relative">
-              <div className="absolute -top-6 -left-7 opacity-20 flex lg:hidden">
-                <FlowerPattern />
-              </div>
-              <div className="absolute bottom-0 -right-7 opacity-20 flex lg:hidden">
-                <FlowerPattern1 />
-              </div>
-              <SpringCashCard number={number} exp={exp} cvc={cvc} />
-            </div>
-            <div className="bg-white order-1 lg:order-2 rounded-2xl shadow-xl p-8 relative z-20 w-full lg:w-1/2 h-full flex flex-col justify-center gap-6 font-mackinac min-h-[638px]">
-              <div
-                className="bg-[#F9F9F9] rounded-full absolute top-5 right-5 size-6 p-1"
-                onClick={() => setOpen(false)}
-              >
-                <X className="text-[#333333] size-4" strokeWidth={0.8} />
-              </div>
-              <div className="font-[500] text-[32px] leading-[115%] -tracking-[2%] text-[#444444] text-center">
-                Provide your phone number so we can text you your
-                <span className="inline-flex items-center align-middle gap-2 px-3 text-[28px]">
-                  <div className="text-[32px] p-1.5 px-2.5 text-white bg-[#65BD82] rounded-md">
-                    free <strong className="font-bold">$25</strong>
-                  </div>
-                  <VisaBrand />
-                </span>
-                card.
-              </div>
-              <div className="flex w-full justify-center">
-                <InputOTP maxLength={10}>
-                  <InputOTPGroup className="gap-1">
-                    <InputOTPSlot index={0} />
-                    <InputOTPSlot index={1} />
-                    <InputOTPSlot index={2} />
-                  </InputOTPGroup>
-                  <InputOTPSeparator />
-                  <InputOTPGroup className="gap-1">
-                    <InputOTPSlot index={3} />
-                    <InputOTPSlot index={4} />
-                    <InputOTPSlot index={5} />
-                  </InputOTPGroup>
-                  <InputOTPSeparator />
-                  <InputOTPGroup className="gap-1">
-                    <InputOTPSlot index={6} />
-                    <InputOTPSlot index={7} />
-                    <InputOTPSlot index={8} />
-                    <InputOTPSlot index={9} />
-                  </InputOTPGroup>
-                </InputOTP>
-              </div>
-            </div>
-          </div>
+          <motion.div
+            key={step}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4, ease: 'easeInOut' }}
+            className="z-10 flex flex-col lg:flex-row lg:gap-0 gap-4 items-center px-7 py-8 h-full"
+          >
+            {step === 0 && (
+              <StepPhone
+                form={form}
+                onNext={() => setStep(1)}
+                number={number}
+                exp={exp}
+                cvc={cvc}
+                setOpen={setOpen}
+              />
+            )}
+            {step === 1 && (
+              <StepAddress
+                form={second_form}
+                onBack={() => setStep(0)}
+                onNext={() => setStep(2)}
+                name={name}
+                address1={address1}
+                city={city}
+                setOpen={setOpen}
+              />
+            )}
+            {step === 2 && (
+              <StepComplete
+                cardInfo={{ number, exp, cvc }}
+                address={second_form.getValues()}
+                name={name}
+                city={city}
+                address1={address1}
+                address2={address2}
+                number={number}
+                exp={exp}
+                cvc={cvc}
+                setOpen={setOpen}
+              />
+            )}
+          </motion.div>
         </div>
       </DialogContent>
     </Dialog>
-  );
-};
-
-const SpringCashCard = ({ number, exp, cvc }: SpringCashCardProps) => {
-  return (
-    <div className="absolute top-[180px] -left-7 w-[434px] h-[458px]">
-      <img src="/images/card.png" alt="Hand" className="w-full h-full" />
-      <div className="w-full relative">
-        <div className="absolute bottom-[284px] left-[99px] text-white text-[18px] tracking-[0.1em] font-medium">
-          {number}
-        </div>
-
-        <div className="absolute bottom-[252px] left-[132px] text-white text-[16px] tracking-[0.1em] font-medium blur-[2px]">
-          {exp}
-        </div>
-
-        <div className="absolute bottom-[252px] left-[222px] text-white text-[16px] tracking-[0.1em] font-medium blur-[2px]">
-          {cvc}
-        </div>
-      </div>
-    </div>
   );
 };
 
